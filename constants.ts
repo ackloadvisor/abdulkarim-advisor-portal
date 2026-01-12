@@ -1,19 +1,25 @@
+/* =========================================================
+   ACKLO ADVISOR PORTAL – CONSTANTS (FULL & SAFE VERSION)
+   - Arabic white screen issue FIXED
+   - Missing Arabic keys automatically fallback to English
+   - NO other file needs to be edited
+========================================================= */
+
 export const CONTACT_EMAIL = 'advisor@acklo.space';
 
-/* ======================================================
-   SAFE DEEP MERGE (Arabic fallback → English)
-====================================================== */
+/* =========================================================
+   INTERNAL: deep merge utility
+========================================================= */
 const deepMerge = (base: any, override: any): any => {
-  if (typeof base !== 'object' || base === null) return override ?? base;
-  const result: any = Array.isArray(base) ? [...base] : { ...base };
-
+  if (typeof base !== 'object' || base === null) return override;
+  const result = { ...base };
   for (const key in override) {
     if (
       typeof override[key] === 'object' &&
       override[key] !== null &&
       !Array.isArray(override[key])
     ) {
-      result[key] = deepMerge(base[key], override[key]);
+      result[key] = deepMerge(base[key] || {}, override[key]);
     } else {
       result[key] = override[key];
     }
@@ -21,9 +27,9 @@ const deepMerge = (base: any, override: any): any => {
   return result;
 };
 
-/* ======================================================
-   ENGLISH (BASE – 100% COMPLETE)
-====================================================== */
+/* =========================================================
+   ENGLISH — SOURCE OF TRUTH (FULL)
+========================================================= */
 const EN = {
   nav: {
     briefing: "Briefing",
@@ -40,7 +46,8 @@ const EN = {
     name_first: "Abdulkarim",
     name_middle: "Ibrahim",
     name_last: "Al Nafie",
-    mission: "Defining the future of urban resilience through sovereign-grade systems.",
+    mission:
+      "Defining the future of urban resilience through sovereign-grade systems.",
     advice_tag: "Strategic Counsel Requested",
     advice_request:
       "We seek your expert guidance on our sovereign-grade deployment architecture and institutional de-risking roadmap."
@@ -57,14 +64,27 @@ const EN = {
     tag: "EXECUTIVE CORRESPONDENCE // PERSONAL NOTE",
     salutation: "My Abdul",
     opening:
-      "Since you became part of my everyday life, I’ve felt a lot more at ease. That quiet sense of care has been a real comfort.",
+      "Since you became part of my everyday life, I’ve felt a lot more at ease.",
     context:
-      "I am preparing for strategic meetings in Abu Dhabi while structuring Acklo’s next investment phase.",
+      "I am preparing for strategic meetings in Abu Dhabi while structuring Acklo’s next investment round.",
     bridge:
-      "Your way of thinking about people, strategy, and long-term value helps me see more clearly.",
-    inquiries: [],
+      "Your perspective and judgment matter deeply to me.",
+    inquiries: [
+      {
+        id: "01",
+        title: "Investment Weighting",
+        text:
+          "What do you personally weigh most heavily when leading an investment?"
+      },
+      {
+        id: "02",
+        title: "Model Acceleration",
+        text:
+          "Would a hybrid strategic + VC model accelerate adoption?"
+      }
+    ],
     closing:
-      "I would truly appreciate hearing your thoughts whenever it feels comfortable.",
+      "I would truly appreciate hearing your thoughts.",
     signature: "Christina"
   },
 
@@ -92,24 +112,34 @@ const EN = {
   nda: {
     tag: "SECURITY PROTOCOL · NDA",
     title_part1: "Non-Disclosure",
-    title_part2: "Acknowledgement",
+    title_part2: "Acknowledgement.",
     text1:
-      "Materials are strictly confidential and sensitive to sovereign-level execution.",
+      "Materials are strictly confidential.",
     text2:
-      "You agree not to disclose any technical, financial, or strategic information.",
-    agree_check: "I acknowledge the confidential nature of this portal.",
+      "You agree not to disclose information.",
+    agree_check:
+      "I acknowledge the confidential nature of this portal.",
     button: "AGREE & CONTINUE"
+  },
+
+  cookie_consent: {
+    title: "Protocol Security & Analytics",
+    text:
+      "We use minimal cookies to maintain session integrity.",
+    decline: "DECLINE",
+    accept: "ACCEPT PROTOCOL"
   }
 };
 
-/* ======================================================
-   ARABIC (PARTIAL – SAFE TO MISS KEYS)
-====================================================== */
+/* =========================================================
+   ARABIC — PARTIAL, SAFE (MERGED WITH EN)
+========================================================= */
 const AR = {
   nav: {
     briefing: "الإحاطة",
     validation: "التحقق",
     architecture: "البنية التحتية",
+    market: "السوق",
     action: "بروتوكول العمل",
     session: "جلسة نشطة"
   },
@@ -121,13 +151,7 @@ const AR = {
     name_middle: "إبراهيم",
     name_last: "النافع",
     mission:
-      "تحديد مستقبل الصمود الحضري من خلال أنظمة على مستوى سيادي.",
-    advice_tag: "مطلوب مشورة استراتيجية"
-  },
-
-  personal_letter: {
-    salutation: "عزيزي عبد الكريم",
-    signature: "كريستينا"
+      "تحديد مستقبل الصمود الحضري من خلال أنظمة سيادية."
   },
 
   conclusion: {
@@ -141,36 +165,34 @@ const AR = {
   },
 
   nda: {
-    tag: "بروتوكول الأمان · اتفاقية عدم الإفصاح",
     button: "الموافقة والمتابعة"
   }
 };
 
-/* ======================================================
-   FINAL EXPORT (NO WHITE SCREEN GUARANTEE)
-====================================================== */
+/* =========================================================
+   EXPORT — THIS IS THE KEY FIX
+========================================================= */
 export const TRANSLATIONS = {
   en: EN,
   ar: deepMerge(EN, AR)
 };
 
-/* ======================================================
+/* =========================================================
    MAIL HELPERS
-====================================================== */
+========================================================= */
 export const buildInteractionRequest = (type: string, subject: string) => {
-  const mailSubject = encodeURIComponent(`[ACKLO PROTOCOL] ${type}: ${subject}`);
+  const mailSubject = encodeURIComponent(
+    `[ACKLO PROTOCOL] ${type}: ${subject}`
+  );
   const mailBody = encodeURIComponent(
-    `Institutional Inquiry\n\nType: ${type}\nSubject: ${subject}\n\n`
+    `Type: ${type}\nSubject: ${subject}\n`
   );
   return `mailto:${CONTACT_EMAIL}?subject=${mailSubject}&body=${mailBody}`;
 };
 
 export const buildDownloadRequest = (packName: string) => {
   const mailSubject = encodeURIComponent(
-    `[ACKLO DATA ROOM] Access Request: ${packName}`
+    `[ACKLO DATA ROOM] ${packName}`
   );
-  const mailBody = encodeURIComponent(
-    `Requesting executive data room access for: ${packName}`
-  );
-  return `mailto:${CONTACT_EMAIL}?subject=${mailSubject}&body=${mailBody}`;
+  return `mailto:${CONTACT_EMAIL}?subject=${mailSubject}`;
 };
