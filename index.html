@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ACKLO | Executive Advisor Portal</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #fafaf8;
+      color: #111;
+      font-size: 18px;
+    }
+    [dir="rtl"] {
+      font-family: 'IBM Plex Sans Arabic', sans-serif;
+    }
+  </style>
+</head>
+
+<body class="p-10">
+  <div class="flex gap-4 mb-10">
+    <button onclick="setLang('en')" class="px-4 py-2 border">EN</button>
+    <button onclick="setLang('ar')" class="px-4 py-2 border">AR</button>
+  </div>
+
+  <h1 id="title" class="text-4xl font-bold mb-4">
+    Executive Advisor Portal
+  </h1>
+
+  <p id="desc">
+    Private advisory access for strategic discussions.
+  </p>
+
+  <script>
+    function setLang(lang) {
+      if (lang === 'ar') {
+        document.documentElement.lang = 'ar';
+        document.documentElement.dir = 'rtl';
+        document.getElementById('title').innerText = 'بوابة المستشار التنفيذي';
+        document.getElementById('desc').innerText = 'وصول خاص للنقاشات الاستراتيجية.';
+      } else {
+        document.documentElement.lang = 'en';
+        document.documentElement.dir = 'ltr';
+        document.getElementById('title').innerText = 'Executive Advisor Portal';
+        document.getElementById('desc').innerText = 'Private advisory access for strategic discussions.';
+      }
+    }
+  </script>
+</body>
+</html>
