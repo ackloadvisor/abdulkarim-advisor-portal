@@ -1,198 +1,205 @@
-/* =========================================================
-   ACKLO ADVISOR PORTAL – CONSTANTS (FULL & SAFE VERSION)
-   - Arabic white screen issue FIXED
-   - Missing Arabic keys automatically fallback to English
-   - NO other file needs to be edited
-========================================================= */
 
-export const CONTACT_EMAIL = 'advisor@acklo.space';
+import React, { useState, useEffect, createContext, useContext } from 'react';
+import { Navigation } from './components/Navigation';
+import { Hero } from './components/Hero';
+import { CorporateVideo } from './components/CorporateVideo';
+import { StrategicIntroVideo } from './components/StrategicIntroVideo';
+import { CESPromoVideo } from './components/CESPromoVideo';
+import { ExecutiveLetter } from './components/ExecutiveLetter';
+import { PersonalLetter } from './components/PersonalLetter';
+import { ExecutiveBriefing } from './components/ExecutiveBriefing';
+import { Architecture } from './components/Architecture';
+import { Deployments } from './components/Deployments';
+import { InteractionLayer } from './components/InteractionLayer';
+import { CompetitiveMemorandum } from './components/CompetitiveMemorandum';
+import { StrategicMoat } from './components/StrategicMoat';
+import { ValidationSnapshot } from './components/ValidationSnapshot';
+import { SharedValueBriefing } from './components/SharedValueBriefing';
+import { StrategicBlueprint } from './components/StrategicBlueprint';
+import { SovereignDossier } from './components/SovereignDossier';
+import { Footer } from './components/Footer';
+import { NDAPage } from './components/NDAPage';
+import { NDABar } from './components/NDABar';
+import { buildInteractionRequest, TRANSLATIONS } from './constants';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FadeIn } from './components/MotionWrapper';
 
-/* =========================================================
-   INTERNAL: deep merge utility
-========================================================= */
-const deepMerge = (base: any, override: any): any => {
-  if (typeof base !== 'object' || base === null) return override;
-  const result = { ...base };
-  for (const key in override) {
-    if (
-      typeof override[key] === 'object' &&
-      override[key] !== null &&
-      !Array.isArray(override[key])
-    ) {
-      result[key] = deepMerge(base[key] || {}, override[key]);
-    } else {
-      result[key] = override[key];
+type Language = 'en' | 'ar';
+
+interface LanguageContextType {
+  lang: Language;
+  setLang: (l: Language) => void;
+  t: any;
+}
+
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
+export const useLanguage = () => {
+  const context = useContext(LanguageContext);
+  if (!context) throw new Error("useLanguage must be used within LanguageProvider");
+  return context;
+};
+
+const App: React.FC = () => {
+  const [hasAgreed, setHasAgreed] = useState<boolean>(false);
+  const [cookiesAccepted, setCookiesAccepted] = useState<boolean>(false);
+  const [loading, setLoading] = useState(true);
+  const [lang, setLang] = useState<Language>('en');
+
+  const t = TRANSLATIONS[lang];
+
+  useEffect(() => {
+    const ndaAgreed = document.cookie.split('; ').find(row => row.startsWith('acklo_nda='));
+    if (ndaAgreed && ndaAgreed.split('=')[1] === 'agreed') {
+      setHasAgreed(true);
     }
-  }
-  return result;
-};
 
-/* =========================================================
-   ENGLISH — SOURCE OF TRUTH (FULL)
-========================================================= */
-const EN = {
-  nav: {
-    briefing: "Briefing",
-    validation: "Validation",
-    architecture: "Architecture",
-    market: "Market",
-    action: "Action Protocol",
-    session: "Active Session"
-  },
+    const cookiesAgreed = document.cookie.split('; ').find(row => row.startsWith('acklo_cookies='));
+    if (cookiesAgreed && cookiesAgreed.split('=')[1] === 'accepted') {
+      setCookiesAccepted(true);
+    }
+    
+    const savedLang = localStorage.getItem('acklo_lang') as Language;
+    if (savedLang && (savedLang === 'en' || savedLang === 'ar')) {
+      setLang(savedLang);
+    }
+    
+    setLoading(false);
+  }, []);
 
-  hero: {
-    protocol: "Institutional Protocol · Private Access",
-    welcome: "Honoring the presence of",
-    name_first: "Abdulkarim",
-    name_middle: "Ibrahim",
-    name_last: "Al Nafie",
-    mission:
-      "Defining the future of urban resilience through sovereign-grade systems.",
-    advice_tag: "Strategic Counsel Requested",
-    advice_request:
-      "We seek your expert guidance on our sovereign-grade deployment architecture and institutional de-risking roadmap."
-  },
+  const handleAgreeNDA = () => {
+    document.cookie = "acklo_nda=agreed; path=/; max-age=86400; Secure";
+    setHasAgreed(true);
+  };
 
-  pitch: {
-    tag: "EXECUTIVE BRIEFING",
-    title: "60-Second Elevator Pitch",
-    text:
-      "ACKLO is the technology infrastructure that makes collaborative urban governance executable. The challenge of Vision 2030 and Net Zero 2050 is not ambition, but execution and verification."
-  },
+  const handleAcceptCookies = () => {
+    document.cookie = "acklo_cookies=accepted; path=/; max-age=31536000; Secure";
+    setCookiesAccepted(true);
+  };
 
-  personal_letter: {
-    tag: "EXECUTIVE CORRESPONDENCE // PERSONAL NOTE",
-    salutation: "My Abdul",
-    opening:
-      "Since you became part of my everyday life, I’ve felt a lot more at ease.",
-    context:
-      "I am preparing for strategic meetings in Abu Dhabi while structuring Acklo’s next investment round.",
-    bridge:
-      "Your perspective and judgment matter deeply to me.",
-    inquiries: [
-      {
-        id: "01",
-        title: "Investment Weighting",
-        text:
-          "What do you personally weigh most heavily when leading an investment?"
-      },
-      {
-        id: "02",
-        title: "Model Acceleration",
-        text:
-          "Would a hybrid strategic + VC model accelerate adoption?"
-      }
-    ],
-    closing:
-      "I would truly appreciate hearing your thoughts.",
-    signature: "Christina"
-  },
+  const toggleLang = (l: Language) => {
+    setLang(l);
+    localStorage.setItem('acklo_lang', l);
+  };
 
-  conclusion: {
-    tag: "Briefing Conclusion",
-    title: "Abdulkarim, We Await Your Strategic Input.",
-    subtext:
-      "Your perspective on our institutional readiness is of paramount importance to ACKLO.",
-    submit: "SUBMIT RESPONSE",
-    dataroom: "VIEW DATA ROOM"
-  },
+  if (loading || !t) return null;
 
-  final_statement: {
-    top: "ACKLO turns national vision into urban proof.",
-    bottom: "From policy to data. From data to scale."
-  },
+  return (
+    <LanguageContext.Provider value={{ lang, setLang: toggleLang, t }}>
+      <div 
+        dir={lang === 'ar' ? 'rtl' : 'ltr'} 
+        className={`bg-[#fafaf8] min-h-screen text-zinc-900 selection:bg-emerald-500 selection:text-white overflow-x-hidden rtl-transition`}
+      >
+        <AnimatePresence>
+          {!hasAgreed && (
+            <NDAPage onAgree={handleAgreeNDA} />
+          )}
+        </AnimatePresence>
 
-  footer: {
-    copyright:
-      "© 2026 ACKLO INFRASTRUCTURE SYSTEMS. ALL RIGHTS RESERVED.",
-    privacy: "Privacy Policy",
-    cookie: "Cookie Policy"
-  },
+        <Navigation />
+        
+        <main className={`transition-all duration-1000 ${hasAgreed ? 'opacity-100 blur-0' : 'opacity-0 blur-xl scale-95'}`}>
+          <Hero />
+          
+          <PersonalLetter />
 
-  nda: {
-    tag: "SECURITY PROTOCOL · NDA",
-    title_part1: "Non-Disclosure",
-    title_part2: "Acknowledgement.",
-    text1:
-      "Materials are strictly confidential.",
-    text2:
-      "You agree not to disclose information.",
-    agree_check:
-      "I acknowledge the confidential nature of this portal.",
-    button: "AGREE & CONTINUE"
-  },
+          <StrategicIntroVideo />
 
-  cookie_consent: {
-    title: "Protocol Security & Analytics",
-    text:
-      "We use minimal cookies to maintain session integrity.",
-    decline: "DECLINE",
-    accept: "ACCEPT PROTOCOL"
-  }
-};
+          <CorporateVideo />
 
-/* =========================================================
-   ARABIC — PARTIAL, SAFE (MERGED WITH EN)
-========================================================= */
-const AR = {
-  nav: {
-    briefing: "الإحاطة",
-    validation: "التحقق",
-    architecture: "البنية التحتية",
-    market: "السوق",
-    action: "بروتوكول العمل",
-    session: "جلسة نشطة"
-  },
+          <ExecutiveBriefing />
 
-  hero: {
-    protocol: "بروتوكول مؤسسي · وصول خاص",
-    welcome: "نتشرف بحضور",
-    name_first: "عبد الكريم",
-    name_middle: "إبراهيم",
-    name_last: "النافع",
-    mission:
-      "تحديد مستقبل الصمود الحضري من خلال أنظمة سيادية."
-  },
+          <SovereignDossier />
+          
+          <ValidationSnapshot />
 
-  conclusion: {
-    submit: "إرسال الرد",
-    dataroom: "عرض غرفة البيانات"
-  },
+          <Architecture />
 
-  footer: {
-    privacy: "سياسة الخصوصية",
-    cookie: "سياسة ملفات الارتباط"
-  },
+          <StrategicBlueprint />
 
-  nda: {
-    button: "الموافقة والمتابعة"
-  }
-};
+          <CESPromoVideo />
 
-/* =========================================================
-   EXPORT — THIS IS THE KEY FIX
-========================================================= */
-export const TRANSLATIONS = {
-  en: EN,
-  ar: deepMerge(EN, AR)
-};
+          <CompetitiveMemorandum />
 
-/* =========================================================
-   MAIL HELPERS
-========================================================= */
-export const buildInteractionRequest = (type: string, subject: string) => {
-  const mailSubject = encodeURIComponent(
-    `[ACKLO PROTOCOL] ${type}: ${subject}`
+          <StrategicMoat />
+          
+          <Deployments />
+          
+          <section className="py-24 px-[6vw] bg-white border-y border-zinc-100">
+            <FadeIn>
+              <div className="relative w-full max-w-7xl mx-auto aspect-video border border-zinc-200 bg-zinc-50 shadow-2xl overflow-hidden group">
+                <iframe
+                  src="https://player.cloudinary.com/embed/?cloud_name=dayqcryf0&public_id=acklopromo3_support_SDG_hximp1&profile=cld-default"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 'none', position: 'absolute', top: 0, left: 0 }}
+                  allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+                  allowFullScreen
+                  title="ACKLO Strategic Goals"
+                ></iframe>
+              </div>
+            </FadeIn>
+          </section>
+
+          <SharedValueBriefing />
+
+          <section className="py-60 bg-[#fafaf8] text-start px-[6vw] border-y border-zinc-200">
+             <motion.div 
+               initial={{ opacity: 0, y: 50 }}
+               whileInView={{ opacity: 1, y: 0 }}
+               transition={{ duration: 1 }}
+               className="max-w-full"
+             >
+                <div className="text-xs font-mono text-emerald-600 mb-16 uppercase tracking-[0.8em] font-bold italic">{t.conclusion?.tag}</div>
+                <h4 className="text-heading font-semibold mb-16 tracking-tighter leading-[0.9] text-zinc-900 uppercase italic">
+                  {t.conclusion?.title?.includes(',') ? t.conclusion.title.split(',')[0] : t.conclusion?.title} <br/>
+                  <span className="text-zinc-300 italic font-light">{t.conclusion?.title?.includes(',') ? t.conclusion.title.split(',')[1] : ''}</span>
+                </h4>
+                <h1 className="text-zinc-400 mb-20 font-extralight text-3xl md:text-5xl max-w-6xl leading-tight tracking-tight italic">
+                  "{t.conclusion?.subtext}"
+                </h1>
+                <div className="flex flex-col lg:flex-row gap-10 items-start">
+                    <a 
+                      href={buildInteractionRequest('Response', 'Abdulkarim Ibrahim Al Nafie Briefing')}
+                      className="w-full lg:w-auto px-20 py-10 bg-emerald-500 text-white font-mono text-sm font-bold tracking-[0.5em] hover:bg-emerald-600 transition-all shadow-[0_30px_90px_rgba(16,185,129,0.2)] uppercase"
+                    >
+                      {t.conclusion?.submit}
+                    </a>
+                    <a 
+                      href="#interactions"
+                      className="w-full lg:w-auto px-20 py-10 border border-zinc-200 text-zinc-400 font-mono text-sm tracking-[0.5em] hover:border-emerald-500/50 hover:text-emerald-600 transition-all uppercase"
+                    >
+                      {t.conclusion?.dataroom}
+                    </a>
+                </div>
+                
+                <div className="mt-40 pt-20 border-t border-zinc-100">
+                  <p className="text-2xl md:text-4xl text-emerald-600 font-luxury italic leading-tight mb-4">
+                    {t.final_statement?.top}
+                  </p>
+                  <p className="text-xl md:text-2xl text-zinc-400 font-mono uppercase tracking-widest italic">
+                    {t.final_statement?.bottom}
+                  </p>
+                </div>
+             </motion.div>
+          </section>
+
+          <InteractionLayer />
+        </main>
+
+        <Footer />
+        
+        <AnimatePresence>
+          {(hasAgreed && !cookiesAccepted) && <NDABar onAccept={handleAcceptCookies} />}
+        </AnimatePresence>
+        
+        <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-[-1] overflow-hidden">
+          <div className="absolute top-[-20%] right-[-10%] w-[90vw] h-[90vw] bg-emerald-500/[0.04] blur-[250px] rounded-full"></div>
+          <div className="absolute bottom-[-20%] left-[-20%] w-[80vw] h-[80vw] bg-blue-500/[0.04] blur-[220px] rounded-full"></div>
+        </div>
+      </div>
+    </LanguageContext.Provider>
   );
-  const mailBody = encodeURIComponent(
-    `Type: ${type}\nSubject: ${subject}\n`
-  );
-  return `mailto:${CONTACT_EMAIL}?subject=${mailSubject}&body=${mailBody}`;
 };
 
-export const buildDownloadRequest = (packName: string) => {
-  const mailSubject = encodeURIComponent(
-    `[ACKLO DATA ROOM] ${packName}`
-  );
-  return `mailto:${CONTACT_EMAIL}?subject=${mailSubject}`;
-};
+export default App;
